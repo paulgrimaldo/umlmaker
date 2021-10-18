@@ -1,0 +1,69 @@
+doctype html
+html
+    head
+        title Chat
+        link(rel='stylesheet', href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css")
+        link(rel='stylesheet', href="/stylesheets/chat.css")
+        link(rel='stylesheet', href='//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.css', type='text/css')
+        script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js')
+        script(src='https://code.jquery.com/jquery-2.2.4.min.js', integrity='sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=', crossorigin='anonymous')
+        script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js')
+        script(type='text/javascript', src='//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js')
+    body
+        #myModal.modal.fade(tabindex="-1", role="dialog", aria-labelledby="myModalLabel", aria-hidden="true")
+            .modal-dialog
+                .modal-content
+                    .modal-header
+                        button.close(type="button", data-dismiss="modal", aria-hidden="true") &times;
+                        h4.modal-title Agregar amigo al proyecto
+                    .modal-body
+                        form#form_addfriend(action='/addfriend', title='', method='post')
+                            .md-form.form-sm
+                                i.fa.fa-envelope.prefix
+                                label(for='email') Email del contacto
+                                input#email.form-control(type='email', autofocus='true', required='required')
+                            .modal-footer
+                                button.btn.btn-warnig(type='button', data-dismiss='modal') Cancel
+                                button#btn_send_email.btn.btn-info(type='submit') Send
+
+        ul.pages
+            li.chat.page
+                .chatArea
+                    ul.messages
+                input.inputMessage(placeholder='Escribe un mensaje...')
+                //- input.editorbutton(type='button' value="Editor" class='btn btn-danger')
+                a(href='/designer/' + proyecto.id)
+                    button.btn.btn-danger.editorbutton(type='submit')
+                        | Editor
+            li
+                a.btn.btn-primary.btn-lg.addFriend(href="#myModal", data-toggle="modal") &plus;
+
+
+        script(type='text/javascript').
+
+            // make user object accessible for javascript
+            // this are received from proyectoController.
+            var proyecto = !{JSON.stringify(proyecto)};
+            var user = !{JSON.stringify(user)};
+            var messages = !{JSON.stringify(mensajes)};
+            $("#form_addfriend").submit(function (event) {
+                /* stop form from submitting normally */
+                event.preventDefault();
+                /* get the action attribute from the <form action=""> element */
+                var $form = $(this), url = $form.attr('action');
+                var email = $('#email').val();
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    data: {
+                        'email': email,
+                        'id_proyecto': proyecto.id
+                    },
+                    success: function (response) {
+                        Command: toastr["success"](response);
+                    }
+                });
+            });
+
+        script(src='/javascripts/main.js')
+      

@@ -1,0 +1,22 @@
+extends ../templates/default
+
+block content
+  .container
+    .row
+      .col-md-8.col-md-offset-2
+        .panel.panel-default
+          .panel-heading Registro de proyectos
+          .panel-body
+            form.form-horizontal(method='POST', action='/proyectos')
+              .form-group
+                label.col-md-4.control-label(for='name') Nombre
+                .col-md-6
+                  input#name.form-control(type='text', name='name', required='', autofocus='')
+              .form-group
+                label.col-md-4.control-label(for='descripcion') Descripcion
+                .col-md-6
+                  input#descripcion.form-control(type='text', name='descripcion', required='', autofocus='')
+              .form-group
+                .col-md-6.col-md-offset-4
+                  button.btn.btn-primary(type='submit')
+                    | Registrar

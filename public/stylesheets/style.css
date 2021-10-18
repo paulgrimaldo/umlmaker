@@ -1,0 +1,408 @@
+body {
+    font-family: verdana, sans serif;
+    font-size: small;
+    padding: 0px;
+    margin: 0px;
+    background: #FFF;
+    visibility: hidden;
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+#area {
+    position: relative;
+    background: transparent url(../images/back.png);
+    width: 3000px;
+    height: 3000px;
+}
+
+#controls {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}
+
+#bar {
+    text-align: center;
+    background-color: #ccc;
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    width: 150px;
+    padding: 0px 5px 5px;
+    -moz-box-shadow: -4px 4px 8px #888; /* FF 3.5+ */
+    -webkit-box-shadow: -4px 4px 8px #888; /* Safari 3.0+, Chrome */
+    box-shadow: -4px 4px 8px #888; /* Opera 10.5, IE 9.0 */
+    filter: progid:DXImageTransform.Microsoft.Shadow(Strength=5, Direction=215, Color='#888888'); /* IE 6, IE 7 */
+    -ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=5, Direction=215, Color='#888888')"; /* IE 8 */
+}
+
+#bar input {
+    display: block;
+    width: 90%;
+    margin: auto;
+}
+
+#bar input.small {
+    width: 45%;
+    display: inline;
+}
+
+#toggle {
+    padding: 5px 0px;
+    margin-bottom: 5px;
+    cursor: pointer;
+    background-position: 50% 5px;
+    background-repeat: no-repeat;
+    height: 5px;
+}
+
+#toggle:hover {
+    background-color: #bbb;
+}
+
+#toggle.on {
+    background-image: url(../images/up.gif);
+}
+
+#toggle.off {
+    background-image: url(../images/down.gif);
+}
+
+#minimap {
+    position: fixed;
+    width: 100px;
+    height: 100px;
+    right: 0px;
+    bottom: 0px;
+    background-color: #fff;
+    border: 1px solid #000;
+    opacity: 0.9;
+    overflow: hidden;
+}
+
+.mini {
+    position: absolute;
+    border: 1px solid #000;
+    background-color: #eea;
+    font-size: 1px;
+    line-height: 1px;
+}
+
+.mini_selected {
+    background-color: #f85;
+}
+
+.port {
+    position: absolute;
+    border: 2px solid #f00;
+}
+
+.table {
+    position: absolute;
+    border: 1px solid #000;
+    background-color: #ddd;
+    cursor: pointer;
+    -moz-box-shadow: 4px 4px 8px #888; /* FF 3.5+ */
+    -webkit-box-shadow: 4px 4px 8px #888; /* Safari 3.0+, Chrome */
+    box-shadow: 4px 4px 8px #888; /* Opera 10.5, IE 9.0 */
+    filter: progid:DXImageTransform.Microsoft.Shadow(Strength=5, Direction=135, Color='#888888'); /* IE 6, IE 7 */
+    -ms-filter: progid:DXImageTransform.Microsoft.Shadow(Strength=5, Direction=135, Color='#888888'); /* IE 8 */
+    border-radius: 3px;
+}
+
+.table table {
+    border-collapse: collapse;
+}
+
+.table.selected {
+    border: 2px solid #000;
+}
+
+.table thead .title {
+    text-align: center;
+    padding: 3px 30px;
+}
+
+.table tbody {
+    border-top: 1px dotted #888;
+}
+
+.table tbody td {
+    padding: 3px;
+}
+
+.table tbody .selected {
+    font-weight: bold;
+    color: #f00;
+    display: inline-block;
+}
+
+.table tbody .title {
+    display: inline-block;
+}
+
+.primary {
+    font-weight: bold;
+}
+
+.key {
+    font-style: italic;
+}
+
+.primary.key {
+    font-style: normal;
+}
+
+.typehint {
+    font-size: 80%;
+    color: gray;
+}
+
+.comment {
+    font-size: 80%;
+    font-weight: normal;
+    margin-right: 0.5em;
+}
+
+.adding {
+    cursor: crosshair;
+}
+
+.relation {
+    overflow: hidden;
+}
+
+#background {
+    position: absolute;
+    background-color: #000;
+    opacity: 0.5;
+    visibility: hidden;
+}
+
+#window {
+    position: absolute;
+    visibility: hidden;
+    background-color: #fff;
+    border: 6px double #333;
+}
+
+#windowtitle {
+    border-bottom: 2px solid #333;
+    padding: 2px;
+    padding-left: 1em;
+    font-weight: bold;
+    background-color: rgb(238, 238, 170);
+}
+
+#windowcontent {
+    padding: 1em;
+}
+
+#windowok, #windowcancel {
+    margin: 0em 1em 1em;
+}
+
+.small {
+    font-size: 85%;
+}
+
+#textarea {
+    width: 650px;
+    height: 200px;
+}
+
+#opts {
+    width: 700px;
+}
+
+#keys {
+    white-space: nowrap;
+    text-align: center;
+}
+
+legend {
+    font-weight: bold;
+}
+
+label, input, select {
+    vertical-align: middle;
+}
+
+#throbber {
+    position: absolute;
+    top: 2px;
+    right: 3px;
+}
+
+#rubberband {
+    position: absolute;
+    border: 1px solid #000;
+    background: #888;
+    opacity: 0.5;
+    visibility: hidden;
+}
+
+/*Estilos para el chat*/
+.text {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.mytext {
+    border: 0;
+    padding: 10px;
+    background: whitesmoke;
+}
+
+.text > p:first-of-type {
+    width: 100%;
+    margin-top: 0;
+    margin-bottom: auto;
+    line-height: 13px;
+    font-size: 12px;
+}
+
+.text > p:last-of-type {
+    width: 100%;
+    text-align: right;
+    color: silver;
+    margin-bottom: -7px;
+    margin-top: auto;
+}
+
+.text-l {
+    float: left;
+    padding-right: 10px;
+}
+
+.text-r {
+    float: right;
+    padding-left: 10px;
+}
+
+.macro {
+    margin-top: 5px;
+    width: 100%;
+    border-radius: 5px;
+    padding: 5px;
+    display: flex;
+}
+
+.msj-rta {
+    float: right;
+    background: whitesmoke;
+}
+
+.msj {
+    float: left;
+    background: white;
+}
+
+.frame {
+    position: relative;
+    min-height: 1px;
+    padding-right: 15px;
+    padding-left: 15px;
+    background: #e0e0de;
+    width: 50%;
+    float: left;
+    margin-left: 25%;
+    height: 450px;
+    overflow: hidden;
+
+}
+
+.frame > div:last-of-type {
+    position: absolute;
+    bottom: 5px;
+    width: 100%;
+    display: flex;
+}
+
+ul {
+    width: 100%;
+    height: 100%;
+    list-style-type: none;
+    top: 1%;
+    padding: 18px;
+    position: absolute;
+    bottom: 50%;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+
+}
+.avatar{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    width:25%;
+    float:left;
+    padding-right:10px;
+}
+.msj:before {
+    width: 0;
+    height: 0;
+    content: "";
+    top: -5px;
+    left: -14px;
+    position: relative;
+    border-style: solid;
+    border-width: 0 13px 13px 0;
+    border-color: transparent #ffffff transparent transparent;
+}
+
+.msj-rta:after {
+    width: 0;
+    height: 0;
+    content: "";
+    top: -5px;
+    left: 14px;
+    position: relative;
+    border-style: solid;
+    border-width: 13px 13px 0 0;
+    border-color: whitesmoke transparent transparent transparent;
+}
+
+::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+    color: #d4d4d4;
+}
+
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 10; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0, 0, 0); /* Fallback color */
+    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+}
+
+/* The Close Button */
+.close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    margin-right: 23%;
+    font-weight: bold;
+    position: relative;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+

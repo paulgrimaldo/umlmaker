@@ -1,0 +1,77 @@
+extends ../templates/default
+
+block content
+    .row
+    .col-md-8.col-md-offset-2
+        .panel.panel-default
+            .panel-heading
+                if message.length > 0
+                    div(class='alert alert-success' role='alert')=message
+                a(href='/proyecto/create')
+                    button.btn.btn-danger(type='submit')
+                        | Crear Proyecto
+                hr
+                a.btn.btn-primary(href="#myModal", data-toggle="modal") Ingresar a proyecto
+
+    #myModal.modal.fade(tabindex="-1", role="dialog", aria-labelledby="myModalLabel", aria-hidden="true")
+        .modal-dialog
+            .modal-content
+                .modal-header
+                    button.close(type="button", data-dismiss="modal", aria-hidden="true") &times;
+                    h4.modal-title Ingresar a proyecto mediante codigo
+                .modal-body
+                    form#form_sucribirse(action='/addproject', title='', method='post')
+                        .md-form.form-sm
+                            i.fa.fa-envelope.prefix
+                            label(for='codigo') Codigo del proyecto
+                            input#codigo.form-control(type='text', autofocus='true', required='required')
+                        .modal-footer
+                            button.btn.btn-warnig(type='button', data-dismiss='modal') Cancelar
+                            button#btn_send_email.btn.btn-primary(type='submit') Enviar
+    each proyecto in proyectos
+        .row
+            .col-md-8.col-md-offset-2
+                .panel.panel-default
+                    .col-md-offset-4.container-fluid.padding-side-60
+                        .post-header
+                            h2
+                                span Ingresar a sala:
+                            a(href="/sala/" + proyecto.id )
+                                h2.e-uppercase #{proyecto.nombre}
+                        .row
+                            .col-md-7
+                                ul.jobinfo
+                                    li
+                                        b Fecha Inicio:
+                                        span #{proyecto.fecha_creacion}
+                            .col-md-7
+                                h3.font-accident-two-normal.e-uppercase Descipcion y resumen
+                                p
+                                    | #{proyecto.descripcion}
+                                hr
+                                h3.font-accident-two-normal.e-uppercase Codigo:
+                                    p
+                                        | #{proyecto.codigo}
+
+
+
+    script(type='text/javascript').
+        var usuario = !{JSON.stringify(user)};
+        $("#form_sucribirse").submit(function (event) {
+            /* stop form from submitting normally */
+            event.preventDefault();
+            /* get the action attribute from the <form action=""> element */
+            var $form = $(this), url = $form.attr('action');
+            var email = $('#email').val();
+            var codigo = $('#codigo').val();
+            $.ajax({
+                url: '/addproject',
+                type: "POST",
+                data: {
+                    'codigo': codigo
+                },
+                success: function (response) {
+                    Command: toastr["success"](response);
+                }
+            });
+        });

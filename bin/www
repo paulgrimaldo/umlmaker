@@ -1,0 +1,245 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+var debug = require('debug')('umlmaker:server');
+var http = require('http');
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+
+var server = http.createServer(app);
+
+var io = require('socket.io')(server);
+
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+//persist to database
+var mysql = require('mysql');
+var config = require('.././database/config');
+
+server.listen(port, function () {
+    console.log('Server listening at port %d', port);
+});
+
+var numUsers = 0;
+var TotalUsers = [];
+var ProyectsDoc = [];
+var ProyectsEdit = [];
+
+io.sockets.on('connection', function (socket) {
+    var addedUser = false;
+
+
+    console.log('Recibiendo la conexion del socket,  nuevo usuario');
+
+    socket.on('registerRoom', function (proyecto) {
+        //en este punto como recibo todo el proyecto deberia cargar la data XMl de la bd
+        socket.room = proyecto.id
+        //send client to room 1
+        console.log('Registrando en el cuarto: ' + socket.room);
+
+        //si hay 0 o 1 un usuario en el cuarto habilito globalmente el edit para ese room    
+        if (TotalUsers[socket.room] == 0 || TotalUsers[socket.room] == 1) {
+            ProyectsEdit[socket.room] = true;
+        }
+        console.log(ProyectsEdit[socket.room]);
+
+
+        socket.join(proyecto.id);
+
+
+        data = {
+            edit: ProyectsEdit[socket.room],
+            xml_proyect: ProyectsDoc[socket.room]
+        }
+        socket.emit('registered', data);
+    });
+    socket.on('edit', function (data) {
+        if (ProyectsEdit[socket.room] == null) {
+            ProyectsEdit[socket.room] = [];
+        }
+        //si bandera es true quiere editar, si es false termino de editar
+        if (data.edit) {
+            ProyectsEdit[socket.room] = false;/// false cuando no puedo editar..
+
+        } else {
+            ProyectsEdit[socket.room] = true;
+            if (ProyectsDoc[socket.room] == null) {
+                ProyectsDoc[socket.room] = [];
+            }
+
+            ProyectsDoc[socket.room] = data.xml_proyect; /// actualizo el proyecto del room
+            //database persist
+            var db = mysql.createConnection(config);
+            db.connect();
+            db.query('UPDATE proyecto SET  content=? where id=?', [data.xml_proyect, socket.room], function (err, rows, fields) {
+                if (err) throw  err;
+                db.end();
+            });
+
+            socket.broadcast.to(socket.room).emit('updateXML', ProyectsDoc[socket.room]);
+        }
+        // notifico a todos los usuarios que  si  pueden editar con el estado de la bandera de room
+        data = {
+            edit: ProyectsEdit[socket.room],
+            user_mod: data.user_modificando
+        };
+        socket.broadcast.to(socket.room).emit('edit', data);
+
+    });
+
+    // when the client emits 'new message', this listens and executes
+    socket.on('new message', function (data) {
+        // we tell the client to execute 'new message'
+        // console.log(data);
+        var db = mysql.createConnection(config);
+        db.connect();
+        message = {
+            user_id: data.user.id,
+            created_at: new Date(),
+            message: data.message,
+            id_proyecto: data.proyecto.id,
+            updated_at: new Date()
+        }
+        db.query('INSERT INTO messages SET ?', message, function (err, rows, fields) {
+            if (err) throw  err;
+            db.end();
+            socket.broadcast.to(socket.room).emit('new message', {
+                username: socket.username,
+                message: data.message
+            });
+        });
+
+    });
+
+    // when the client emits 'add user', this listens and executes
+    socket.on('add user', function (username) {
+        if (addedUser) return;
+
+        // we store the username in the socket session for this client
+        socket.username = username;
+        if (TotalUsers[socket.room] == null) {
+            TotalUsers[socket.room] = [];
+        }
+        ++TotalUsers[socket.room];
+        ++numUsers;
+        console.log('Se conecto un usuario, en total: ' + TotalUsers[socket.room]);
+        addedUser = true;
+        socket.emit('login', {
+            numUsers: numUsers,
+            TotalUsers: TotalUsers[socket.room]
+        });
+        // echo globally (all clients) that a person has connected
+        socket.broadcast.to(socket.room).emit('user joined', {
+            username: socket.username,
+            numUsers: numUsers,
+            TotalUsers: TotalUsers[socket.room]
+        });
+    });
+
+    // when the client emits 'typing', we broadcast it to others
+    socket.on('typing', function () {
+        socket.broadcast.to(socket.room).emit('typing', {
+            username: socket.username
+        });
+    });
+
+    // when the client emits 'stop typing', we broadcast it to others
+    socket.on('stop typing', function () {
+        socket.broadcast.to(socket.room).emit('stop typing', {
+            username: socket.username
+        });
+    });
+    socket.on('disconnect', function () {
+        if (addedUser) {
+            --numUsers;
+            --TotalUsers[socket.room];
+
+            console.log('Se desconecto un usuario, quedan: ' + TotalUsers[socket.room]);
+
+            // echo globally that this client has left
+            socket.broadcast.to(socket.room).emit('user left', {
+                username: socket.username,
+                numUsers: numUsers,
+                TotalUsers: TotalUsers[socket.room]
+            });
+        }
+    });
+});
+
+server.on('error', onError);
+server.on('listening', onListening);
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+    var port = parseInt(val, 10);
+
+    if (isNaN(port)) {
+        // named pipe
+        return val;
+    }
+
+    if (port >= 0) {
+        // port number
+        return port;
+    }
+
+    return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+    if (error.syscall !== 'listen') {
+        throw error;
+    }
+
+    var bind = typeof port === 'string'
+        ? 'Pipe ' + port
+        : 'Port ' + port;
+
+    // handle specific listen errors with friendly messages
+    switch (error.code) {
+        case 'EACCES':
+            console.error(bind + ' requires elevated privileges');
+            process.exit(1);
+            break;
+        case 'EADDRINUSE':
+            console.error(bind + ' is already in use');
+            process.exit(1);
+            break;
+        default:
+            throw error;
+    }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+    var addr = server.address();
+    var bind = typeof addr === 'string'
+        ? 'pipe ' + addr
+        : 'port ' + addr.port;
+    debug('Listening on ' + bind);
+}
